@@ -67,10 +67,12 @@ button:hover{
     background:#155f96;
 }
 
-.resultado{
-    margin-top:20px;
-    padding:12px;
-    border-radius:10px;
-    background:#e8f1fa;
-    font-weight:bold;
+.resultado {
+    margin-top: 15px;
+    padding: 10px 14px;
+    background: #f3f7fb;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #2c3e50;
+    text-align: center;
 }
