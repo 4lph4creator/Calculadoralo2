@@ -16,8 +16,6 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-  <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
 
   <!-- CSS -->
@@ -26,15 +24,30 @@
 
 <body>
 
-  <!-- Contenedor app -->
   <div id="app">
+
     <h1>Calculadora LO2</h1>
+
+    <div class="card">
+      <label>Nivel A (mm)</label>
+      <input id="nivelA" type="number" placeholder="Ingrese mm">
+      <div id="m3A">—</div>
+    </div>
+
+    <div class="card">
+      <label>Nivel B (mm)</label>
+      <input id="nivelB" type="number" placeholder="Ingrese mm">
+      <div id="m3B">—</div>
+    </div>
+
+    <div class="resultado" id="resultado">
+      Total descargado: —
+    </div>
+
   </div>
 
-  <!-- Script principal -->
   <script src="app.js"></script>
 
-  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
