@@ -79,3 +79,15 @@ button:hover{
     backdrop-filter: blur(6px);
     border: 1px solid rgba(255,255,255,0.5);
 }
+
+.subtitulo{
+    margin-top:-8px;
+    margin-bottom:18px;
+    font-size:13px;
+    color:#6b7280;
+}
+
+.logo{
+    width:140px;
+    margin-bottom:10px;
+}
