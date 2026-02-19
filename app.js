@@ -33,14 +33,14 @@ const tabla = [
   { mm: 2410, m3: 17556 }
 ];
 
-// INTERPOLACIÓN LINEAL ENTRE PUNTOS
+// INTERPOLACIÓN LINEAL ENTRE PUNTOS + VALIDACIÓN DE RANGO
 function interpolar(mm) {
   if (mm === "" || isNaN(mm)) return null;
 
   mm = Number(mm);
 
-  if (mm <= tabla[0].mm) return tabla[0].m3;
-  if (mm >= tabla[tabla.length - 1].mm) return tabla[tabla.length - 1].m3;
+  // VALIDACIÓN DE DOMINIO REAL
+  if (mm < tabla[0].mm || mm > tabla[tabla.length - 1].mm) return null;
 
   for (let i = 0; i < tabla.length - 1; i++) {
     let a = tabla[i];
@@ -51,6 +51,8 @@ function interpolar(mm) {
       return a.m3 + ratio * (b.m3 - a.m3);
     }
   }
+
+  return null;
 }
 
 // CÁLCULO AUTOMÁTICO
