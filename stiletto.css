@@ -19,14 +19,15 @@ body{
 }
 
 .logo{
-    width:140px;
-    margin-bottom:10px;
+    width: 140px;
+    margin-bottom: 10px;
 }
 
+
 h1{
-    margin-top:0;
-    font-size:22px;
+    margin-bottom: 20px;
 }
+
 
 label{
     display:block;
