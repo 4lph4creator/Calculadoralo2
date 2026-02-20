@@ -1,187 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora LO2</title>
+  <meta charset="UTF-8">
+  <title>Calculadora LO₂</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#1c88d9,#66c3ff);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-
-.card{
-  background:white;
-  padding:24px;
-  border-radius:18px;
-  width:320px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
-}
-
-h1{
-  text-align:center;
-  margin-bottom:4px;
-}
-
-.subtitle{
-  text-align:center;
-  font-size:14px;
-  margin-bottom:18px;
-  color:#666;
-}
-
-.label{
-  font-size:13px;
-  margin-top:12px;
-}
-
-input{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-top:4px;
-  font-size:15px;
-}
-
-.result{
-  text-align:center;
-  margin-top:12px;
-  font-weight:bold;
-}
-
-.alert{
-  color:red;
-  text-align:center;
-  font-size:13px;
-  margin-top:6px;
-}
-</style>
+  <link rel="stylesheet" href="stiletto.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
-<div class="card">
+  <div class="card">
 
-<h1>Calculadora LO₂</h1>
-<div class="subtitle">Conversión y tramo de oxígeno líquido</div>
+    <img src="img/logo_transparent.png" class="logo">
 
-<div class="label">Saldo campaña (m³)</div>
-<input type="number" id="saldoCampana" step="0.01">
+    <h1>Calculadora LO₂</h1>
+    <p class="sub">Conversión y tramo de oxígeno líquido</p>
 
-<div class="label">Nivel A (mmH₂O)</div>
-<input type="number" id="nivelA">
-<div class="result" id="eqA">Equivalente: 0.00 m³</div>
+    <!-- SALDO CAMPAÑA -->
+    <label>Saldo campaña (m³)</label>
+    <input id="saldoCampana" type="number">
+    <div id="saldoMostrado" class="equivalente">—</div>
 
-<div class="label">Nivel B (mmH₂O)</div>
-<input type="number" id="nivelB">
-<div class="result" id="eqB">Equivalente: 0.00 m³</div>
+    <!-- NIVEL A -->
+    <label>Nivel A (mmH₂O)</label>
+    <input id="nivelA" type="number">
+    <div id="m3A" class="equivalente">—</div>
 
-<div class="result" id="total">Total descargado: 0.00 m³</div>
-<div class="result" id="saldoRestante">Saldo restante: 0.00 m³</div>
-<div class="alert" id="alerta"></div>
+    <!-- NIVEL B -->
+    <label>Nivel B (mmH₂O)</label>
+    <input id="nivelB" type="number">
+    <div id="m3B" class="equivalente">—</div>
 
-</div>
+    <!-- RESULTADOS -->
+    <div id="resultado" class="resultado">Total descargado: —</div>
+    <div id="saldoRestante" class="resultado">Saldo restante: —</div>
 
-<script>
+    <!-- MENSAJE ERROR -->
+    <div id="mensajeError" class="error"></div>
 
-// ============================
-// TABLA DEMO (reemplazar luego)
-// ============================
+  </div>
 
-const tabla = [
-  {nivel: 0, vol: 0},
-  {nivel: 100, vol: 1.2},
-  {nivel: 200, vol: 2.6},
-  {nivel: 300, vol: 4.1},
-  {nivel: 400, vol: 5.7},
-  {nivel: 500, vol: 7.5}
-];
-
-// ============================
-// CONVERSIÓN CON INTERPOLACIÓN
-// ============================
-
-function convertir(nivel){
-
-  if(nivel === undefined || nivel === null || isNaN(nivel)) return 0;
-
-  if(nivel <= tabla[0].nivel) return tabla[0].vol;
-  if(nivel >= tabla[tabla.length-1].nivel) return tabla[tabla.length-1].vol;
-
-  for(let i=0;i<tabla.length-1;i++){
-
-    const p1 = tabla[i];
-    const p2 = tabla[i+1];
-
-    if(nivel >= p1.nivel && nivel <= p2.nivel){
-
-      const fraccion = (nivel - p1.nivel) / (p2.nivel - p1.nivel);
-      return p1.vol + fraccion * (p2.vol - p1.vol);
-    }
-  }
-
-  return 0;
-}
-
-// ============================
-// CÁLCULO PRINCIPAL
-// ============================
-
-function calcular(){
-
-  const saldoInicial = parseFloat(saldoCampana.value) || 0;
-  const a = parseFloat(nivelA.value);
-  const b = parseFloat(nivelB.value);
-
-  if((a && (a < tabla[0].nivel || a > tabla[tabla.length-1].nivel)) ||
-     (b && (b < tabla[0].nivel || b > tabla[tabla.length-1].nivel))){
-     alertaEl.textContent = "Nivel fuera de tabla";
-     return;
-  }
-
-  alertaEl.textContent = "";
-
-  const eqA = convertir(a);
-  const eqB = convertir(b);
-
-  eqAEl.textContent = "Equivalente: " + eqA.toFixed(2) + " m³";
-  eqBEl.textContent = "Equivalente: " + eqB.toFixed(2) + " m³";
-
-  let total = 0;
-  if(eqA > eqB) total = eqA - eqB;
-
-  totalEl.textContent = "Total descargado: " + total.toFixed(2) + " m³";
-
-  const saldo = saldoInicial - total;
-  saldoRestanteEl.textContent = "Saldo restante: " + saldo.toFixed(2) + " m³";
-}
-
-// ============================
-// DOM + EVENTOS
-// ============================
-
-const saldoCampana = document.getElementById("saldoCampana");
-const nivelA = document.getElementById("nivelA");
-const nivelB = document.getElementById("nivelB");
-
-const eqAEl = document.getElementById("eqA");
-const eqBEl = document.getElementById("eqB");
-const totalEl = document.getElementById("total");
-const saldoRestanteEl = document.getElementById("saldoRestante");
-const alertaEl = document.getElementById("alerta");
-
-saldoCampana.addEventListener("input",calcular);
-nivelA.addEventListener("input",calcular);
-nivelB.addEventListener("input",calcular);
-
-</script>
+  <script src="app.js"></script>
 
 </body>
 </html>
