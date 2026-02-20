@@ -13,6 +13,7 @@
 
   <div class="card">
 
+    <!-- LOGO -->
     <img src="img/logo_transparent.png" class="logo">
 
     <h1>Calculadora LO₂</h1>
@@ -20,8 +21,8 @@
 
     <!-- SALDO CAMPAÑA -->
     <label>Saldo campaña (m³)</label>
-    <input id="saldoCampana" type="number">
-    <div id="saldoMostrado" class="equivalente">—</div>
+    <input id="saldoInicial" type="number">
+    <div id="saldoInicialTxt" class="equivalente">—</div>
 
     <!-- NIVEL A -->
     <label>Nivel A (mmH₂O)</label>
@@ -37,8 +38,11 @@
     <div id="resultado" class="resultado">Total descargado: —</div>
     <div id="saldoRestante" class="resultado">Saldo restante: —</div>
 
-    <!-- MENSAJE ERROR -->
-    <div id="mensajeError" class="error"></div>
+    <!-- REGISTRO DESCARGA -->
+    <button id="registrar" class="btn">Registrar descarga</button>
+
+    <!-- MENSAJES -->
+    <div id="mensaje" class="error"></div>
 
   </div>
 
