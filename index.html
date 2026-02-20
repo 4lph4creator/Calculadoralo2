@@ -77,12 +77,10 @@ input{
 
 <div class="label">Nivel A (mmH₂O)</div>
 <input type="number" id="nivelA">
-
 <div class="result" id="eqA">Equivalente: 0.00 m³</div>
 
 <div class="label">Nivel B (mmH₂O)</div>
 <input type="number" id="nivelB">
-
 <div class="result" id="eqB">Equivalente: 0.00 m³</div>
 
 <div class="result" id="total">Total descargado: 0.00 m³</div>
@@ -93,18 +91,62 @@ input{
 
 <script>
 
-// ⚠️ CONVERSIÓN TEMPORAL
-// Luego reemplazamos por tu tabla real
+// ============================
+// TABLA DEMO (reemplazar luego)
+// ============================
+
+const tabla = [
+  {nivel: 0, vol: 0},
+  {nivel: 100, vol: 1.2},
+  {nivel: 200, vol: 2.6},
+  {nivel: 300, vol: 4.1},
+  {nivel: 400, vol: 5.7},
+  {nivel: 500, vol: 7.5}
+];
+
+// ============================
+// CONVERSIÓN CON INTERPOLACIÓN
+// ============================
+
 function convertir(nivel){
-  if(!nivel) return 0;
-  return nivel * 0.001; 
+
+  if(nivel === undefined || nivel === null || isNaN(nivel)) return 0;
+
+  if(nivel <= tabla[0].nivel) return tabla[0].vol;
+  if(nivel >= tabla[tabla.length-1].nivel) return tabla[tabla.length-1].vol;
+
+  for(let i=0;i<tabla.length-1;i++){
+
+    const p1 = tabla[i];
+    const p2 = tabla[i+1];
+
+    if(nivel >= p1.nivel && nivel <= p2.nivel){
+
+      const fraccion = (nivel - p1.nivel) / (p2.nivel - p1.nivel);
+      return p1.vol + fraccion * (p2.vol - p1.vol);
+    }
+  }
+
+  return 0;
 }
+
+// ============================
+// CÁLCULO PRINCIPAL
+// ============================
 
 function calcular(){
 
   const saldoInicial = parseFloat(saldoCampana.value) || 0;
   const a = parseFloat(nivelA.value);
   const b = parseFloat(nivelB.value);
+
+  if((a && (a < tabla[0].nivel || a > tabla[tabla.length-1].nivel)) ||
+     (b && (b < tabla[0].nivel || b > tabla[tabla.length-1].nivel))){
+     alertaEl.textContent = "Nivel fuera de tabla";
+     return;
+  }
+
+  alertaEl.textContent = "";
 
   const eqA = convertir(a);
   const eqB = convertir(b);
@@ -113,16 +155,17 @@ function calcular(){
   eqBEl.textContent = "Equivalente: " + eqB.toFixed(2) + " m³";
 
   let total = 0;
-
   if(eqA > eqB) total = eqA - eqB;
 
   totalEl.textContent = "Total descargado: " + total.toFixed(2) + " m³";
 
   const saldo = saldoInicial - total;
   saldoRestanteEl.textContent = "Saldo restante: " + saldo.toFixed(2) + " m³";
-
-  alertaEl.textContent = saldo < 0 ? "Fuera de rango" : "";
 }
+
+// ============================
+// DOM + EVENTOS
+// ============================
 
 const saldoCampana = document.getElementById("saldoCampana");
 const nivelA = document.getElementById("nivelA");
