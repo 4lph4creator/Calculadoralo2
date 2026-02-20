@@ -43,7 +43,9 @@ function interpolar(mm) {
 
   mm = Number(mm);
 
-  if (mm < tabla[0].mm || mm > tabla[tabla.length - 1].mm) return "fuera";
+  if (mm < tabla[0].mm || mm > tabla[tabla.length - 1].mm) {
+    return "fuera";
+  }
 
   for (let i = 0; i < tabla.length - 1; i++) {
     let a = tabla[i];
@@ -57,84 +59,76 @@ function interpolar(mm) {
 }
 
 // ==========================
-// ELEMENTOS DOM
+// ELEMENTOS
 // ==========================
 const saldoInput = document.getElementById("saldoCampana");
 const nivelA = document.getElementById("nivelA");
 const nivelB = document.getElementById("nivelB");
-
-const saldoInicialTxt = document.getElementById("saldoInicialTxt");
 const m3A = document.getElementById("m3A");
 const m3B = document.getElementById("m3B");
-const totalTxt = document.getElementById("resultado");
-const saldoRestanteTxt = document.getElementById("saldoRestante");
-const errorTxt = document.getElementById("error");
+const resultado = document.getElementById("resultado");
+const saldoRestante = document.getElementById("saldoRestante");
+const registrarBtn = document.getElementById("registrar");
 
 // ==========================
-// CARGAR SALDO GUARDADO
+// ESTADO
 // ==========================
-window.addEventListener("load", () => {
-  let guardado = localStorage.getItem("saldoCampana");
-  if (guardado) {
-    saldoInput.value = guardado;
-    saldoInicialTxt.textContent = "Saldo inicial: " + Number(guardado).toFixed(2) + " m³";
-  }
-});
+let totalDescargaActual = 0;
 
 // ==========================
-// ACTUALIZAR
+// CÁLCULO
 // ==========================
 function actualizar() {
-  let saldo = Number(saldoInput.value);
-  let A = nivelA.value;
-  let B = nivelB.value;
+  let A = interpolar(nivelA.value);
+  let B = interpolar(nivelB.value);
 
-  if (!isNaN(saldo)) {
-    localStorage.setItem("saldoCampana", saldo);
-    saldoInicialTxt.textContent = "Saldo inicial: " + saldo.toFixed(2) + " m³";
+  if (A === "fuera") {
+    m3A.textContent = "Nivel fuera de tabla";
+    m3A.style.color = "red";
+    return;
   }
 
-  let valA = interpolar(A);
-  let valB = interpolar(B);
-
-  errorTxt.textContent = "";
-
-  // Nivel A
-  if (valA === "fuera") {
-    m3A.textContent = "—";
-    errorTxt.textContent = "Nivel fuera de tabla";
-  } else if (valA !== null) {
-    m3A.textContent = "Equivalente: " + valA.toFixed(2) + " m³";
-  } else {
-    m3A.textContent = "—";
+  if (B === "fuera") {
+    m3B.textContent = "Nivel fuera de tabla";
+    m3B.style.color = "red";
+    return;
   }
 
-  // Nivel B
-  if (valB === "fuera") {
-    m3B.textContent = "—";
-    errorTxt.textContent = "Nivel fuera de tabla";
-  } else if (valB !== null) {
-    m3B.textContent = "Equivalente: " + valB.toFixed(2) + " m³";
-  } else {
-    m3B.textContent = "—";
-  }
+  m3A.style.color = "";
+  m3B.style.color = "";
 
-  // Cálculos descarga
-  if (typeof valA === "number" && typeof valB === "number") {
-    let total = Math.abs(valA - valB);
-    totalTxt.textContent = "Total descargado: " + total.toFixed(2) + " m³";
+  m3A.textContent = A !== null ? `Equivalente: ${A.toFixed(2)} m³` : "—";
+  m3B.textContent = B !== null ? `Equivalente: ${B.toFixed(2)} m³` : "—";
 
-    if (!isNaN(saldo)) {
-      let restante = saldo - total;
-      saldoRestanteTxt.textContent = "Saldo restante: " + restante.toFixed(2) + " m³";
-      localStorage.setItem("saldoCampana", restante);
-    }
+  if (A !== null && B !== null) {
+    totalDescargaActual = Math.abs(A - B);
+    resultado.textContent = `Total descargado: ${totalDescargaActual.toFixed(2)} m³`;
   }
 }
 
 // ==========================
+// REGISTRAR DESCARGA
+// ==========================
+registrarBtn.addEventListener("click", () => {
+  let saldo = parseFloat(saldoInput.value);
+
+  if (isNaN(saldo)) return;
+
+  saldo -= totalDescargaActual;
+  saldoInput.value = saldo.toFixed(2);
+
+  saldoRestante.textContent = `Saldo restante: ${saldo.toFixed(2)} m³`;
+
+  nivelA.value = "";
+  nivelB.value = "";
+  m3A.textContent = "—";
+  m3B.textContent = "—";
+  resultado.textContent = "Total descargado: —";
+  totalDescargaActual = 0;
+});
+
+// ==========================
 // EVENTOS
 // ==========================
-saldoInput.addEventListener("input", actualizar);
 nivelA.addEventListener("input", actualizar);
 nivelB.addEventListener("input", actualizar);
