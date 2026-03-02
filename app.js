@@ -16,7 +16,7 @@ const tabla = [
 ];
 
 // =====================
-// ESTADO
+// ESTADO PERSISTENTE
 // =====================
 let ultimoTotal = 0;
 let stockPorIsotanque =
@@ -47,16 +47,16 @@ function isotanqueActualIndex(){
 }
 
 function guardarStock(){
-  localStorage.setItem("stockPorIsotanque",JSON.stringify(stockPorIsotanque));
+  localStorage.setItem("stockPorIsotanque", JSON.stringify(stockPorIsotanque));
 }
 
 function guardarHistorial(){
-  localStorage.setItem("historialDescargas",JSON.stringify(historial));
+  localStorage.setItem("historialDescargas", JSON.stringify(historial));
 }
 
 function actualizarStockUI(){
-  const idx=isotanqueActualIndex();
-  const stockActual=stockPorIsotanque[idx]||0;
+  const idx = isotanqueActualIndex();
+  const stockActual = stockPorIsotanque[idx] || 0;
 
   document.getElementById("stockIsotanque").textContent =
     `Stock isotanque seleccionado: ${stockActual.toFixed(2)} m³`;
@@ -67,7 +67,30 @@ function actualizarStockUI(){
 
 function actualizarCargaTotalInicialUI(valor){
   document.getElementById("cargaTotalInicial").value =
-    valor>0?valor.toFixed(2):"";
+    valor > 0 ? valor.toFixed(2) : "";
+}
+
+// =====================
+// HISTORIAL
+// =====================
+function renderHistorial(){
+
+  const cont = document.getElementById("historial");
+  if(!cont) return;
+
+  cont.innerHTML = "";
+
+  [...historial].reverse().forEach(r=>{
+
+    const div = document.createElement("div");
+
+    const fecha = r.fecha.split("-").reverse().join("-");
+
+    div.textContent =
+      `${fecha} — ${r.centro} — Isotanque ${r.isotanque} — ${r.tipo} — ${r.volumen.toFixed(2)} m³`;
+
+    cont.appendChild(div);
+  });
 }
 
 // =====================
@@ -75,14 +98,14 @@ function actualizarCargaTotalInicialUI(valor){
 // =====================
 function recalcularTotalInicial(){
 
-  const cargas=[
+  const cargas = [
     parseNumero(document.getElementById("saldoIso1").value),
     parseNumero(document.getElementById("saldoIso2").value),
     parseNumero(document.getElementById("saldoIso3").value),
     parseNumero(document.getElementById("saldoIso4").value)
   ];
 
-  stockPorIsotanque=cargas;
+  stockPorIsotanque = cargas;
   guardarStock();
 
   actualizarCargaTotalInicialUI(totalBordo());
@@ -94,15 +117,15 @@ function recalcularTotalInicial(){
 // =====================
 function interpolar(mm){
   if(mm===""||isNaN(mm)) return null;
-  mm=Number(mm);
-  if(mm<tabla[0].mm||mm>tabla[tabla.length-1].mm) return "fuera";
+  mm = Number(mm);
+  if(mm < tabla[0].mm || mm > tabla[tabla.length-1].mm) return "fuera";
 
   for(let i=0;i<tabla.length-1;i++){
     const a=tabla[i];
     const b=tabla[i+1];
-    if(mm>=a.mm&&mm<=b.mm){
+    if(mm>=a.mm && mm<=b.mm){
       const r=(mm-a.mm)/(b.mm-a.mm);
-      return a.m3+r*(b.m3-a.m3);
+      return a.m3 + r*(b.m3-a.m3);
     }
   }
 }
@@ -116,11 +139,12 @@ function actualizar(){
 
   if(typeof A==="number"&&typeof B==="number"){
     ultimoTotal=Math.abs(A-B);
-    document.getElementById("resultado").textContent=
+    document.getElementById("resultado").textContent =
       `Total descargado: ${ultimoTotal.toFixed(2)} m³`;
   }else{
     ultimoTotal=0;
-    document.getElementById("resultado").textContent="Total descargado: —";
+    document.getElementById("resultado").textContent =
+      "Total descargado: —";
   }
 }
 
@@ -154,7 +178,9 @@ function registrarDescarga(volumen,tipo){
   });
 
   guardarHistorial();
+
   actualizarStockUI();
+  renderHistorial();
 }
 
 function registrarPorTramo(){
@@ -176,6 +202,7 @@ function nuevaCampana(){
 
   stockPorIsotanque=[0,0,0,0];
   historial=[];
+
   guardarStock();
   guardarHistorial();
 
@@ -186,12 +213,14 @@ function nuevaCampana(){
 
   actualizarCargaTotalInicialUI(0);
   actualizarStockUI();
+  renderHistorial();
 }
 
 // =====================
-// RESTAURAR
+// RESTAURAR AL INICIAR
 // =====================
 window.addEventListener("load",()=>{
+
   document.getElementById("saldoIso1").value=stockPorIsotanque[0]||"";
   document.getElementById("saldoIso2").value=stockPorIsotanque[1]||"";
   document.getElementById("saldoIso3").value=stockPorIsotanque[2]||"";
@@ -199,6 +228,7 @@ window.addEventListener("load",()=>{
 
   actualizarStockUI();
   actualizarCargaTotalInicialUI(totalBordo());
+  renderHistorial();
 });
 
 // =====================
